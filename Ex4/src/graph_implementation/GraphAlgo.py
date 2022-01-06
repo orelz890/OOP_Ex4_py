@@ -49,6 +49,17 @@ class GraphAlgo(GraphAlgoInterface):
         except:
             return False
 
+    def load_from_str(self, json_str: str) -> bool:
+        if json_str is None:
+            return False
+        self.graph = DiGraph()
+        graph_dict: dict = json.loads(json_str)
+        for node_dict in graph_dict.get("Nodes"):
+            self.graph.add_node(node_dict.get("id"), tuple(node_dict.get("pos").split(",")))
+        for edge_dict in graph_dict.get("Edges"):
+            self.graph.add_edge(edge_dict.get("src"), edge_dict.get("dest"), edge_dict.get("w"))
+
+
     def save_to_json(self, file_name: str) -> bool:
         data = {"Nodes": [], "Edges": []}
         for node in self.graph.nodes_dict.values():

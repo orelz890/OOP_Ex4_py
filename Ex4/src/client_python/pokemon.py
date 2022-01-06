@@ -1,11 +1,10 @@
-class pokemon:
-    def __init__(self, pok_data: dict) -> None:
-        self.value = pok_data['value']
-        self.type = int(pok_data['type'])
-        pok_pos = pok_data['pos'].split(',')
-        self.pos = []
-        for n in pok_pos:
-            self.pos.append(float(n))
+
+class Pokemon:
+    def __init__(self, value: float = 1.0, type: int = -1,
+                 pos: tuple = (35.197656770719604, 32.10191878639921, 0.0)) -> None:
+        self.value = value
+        self.type = type
+        self.pos = pos
         self.src = None
         self.dest = None
         self.agent = None
@@ -13,16 +12,7 @@ class pokemon:
     def __repr__(self) -> str:
         return str((self.src, self.dest))
 
-
-if __name__ == '__main__':
-    p=pokemon(
-                {
-
-                        "value": 5.0,
-                        "type": -1,
-                        "pos": "35.197656770719604,32.10191878639921,0.0"
-
-                }
-
-    )
-    print(p.pos)
+    def load_pokemon(self, pokemon1: dict):
+        self.value = pokemon1.get("value")
+        self.type = pokemon1.get("type")
+        self.pos = tuple(pokemon1.get("pos").split(","))
