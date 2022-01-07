@@ -1,5 +1,3 @@
-import math
-from client import Client
 
 class Agent:
     def __init__(self, id: int = 0, value: float = 0.0, src: int = 0, dest: int = 0, speed: float = 1.0,
@@ -10,6 +8,9 @@ class Agent:
         self.dest = dest
         self.speed = speed
         self.pos = pos
+        self.missions: [int] = []
+        self.path: [int] = []
+        self.free_time = 0
 
     def load_agent(self, agent: dict):
         self.id = agent.get("id")
