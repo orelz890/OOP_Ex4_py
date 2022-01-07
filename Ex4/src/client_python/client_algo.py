@@ -1,14 +1,10 @@
 import json
-import math
-
 from Ex4.src.graph_implementation.GraphAlgo import GraphAlgo
 from Ex4.src.graph_implementation.DiGraph import DiGraph
 from Ex4.src.client_python.agent import Agent
 from Ex4.src.client_python.pokemon import Pokemon
 from Ex4.src.client_python.client import Client
-
-import agent
-import client
+import time
 
 epsilon = 0.0000001
 
@@ -19,6 +15,7 @@ class Game:
         self.pokemons = {}
         self.graph_algo: GraphAlgo = GraphAlgo()
         self.graph_algo.load_from_str(graph_str)
+        self.sleep_time = []
 
     def load_game_data(self, pokemons_str: str, agents_str: str):
 
@@ -58,21 +55,10 @@ class Game:
 
     # Figure out who will take our beloved pokemons
     def allocate_agent_to_pokemon(self, client: Client):
-        for pokemon in self.pokemons.values():
-            if pokemon.agent_id is None:
-                time, chosen_agent_id = self.priority_cal(pokemon)
-                pokemon.time = time + client.time_to_end()
-                pokemon.agent_id = chosen_agent_id
-                # Agent job time increased if the pokemon not in his way:
-                if pokemon.time > 0:
-                    self.agents.get(str(chosen_agent_id)).free_time = pokemon.time
-            # If the time of pickup has passed remove the pokemon & update (next mission)
-            elif pokemon.time < client.time_to_end():
-                agent: Agent = self.agents.get(str(pokemon.agent_id))
-                agent.dest = -1
-                agent.missions.pop(0)
-                self.pokemons.pop(pokemon.id)
-                self.update_agent_task(client, pokemon.agent_id)
+        for agent in self.agents.values():
+            if agent.dest == -1:
+                pokemon_id = self.priority_cal(agent, client)
+                pass
 
     # update all the agent mission list, need to think how frequently
     def update_agent_task(self, client: Client, agent_id: int):
@@ -89,15 +75,33 @@ class Game:
     # If an agent is free take the highest priority from the list of pokemon (time/value == priority)
     # when allocated he do not change course unless the new pokemon is in his way!
     # returns tuple(time in which he will be peaked, agent allocated for the job)
-    def priority_cal(self, pokemon: Pokemon) -> (float, int):
-        for agent in self.agents.values():
-            i = 0
-            while i < len(agent.path) - 2:
-                if pokemon.src == agent.path[i] and pokemon.dest == agent.path[i + 1]:
-                    return 0, []
-                pass
-        return 0, 0
+    def priority_cal(self, agent: Agent, client: Client) -> int:
+        if agent.dest == -1:
+            best_priority = 0
+            pokemon_id = -1
+            for pokemon in self.pokemons.values():
+                if pokemon.time < client.time_to_end():
+                    self.pokemons.pop(pokemon.id)
+                    continue
+                if pokemon.id != best_priority:
+                    i = 0
+                    while i < len(agent.path) - 2:
+                        if pokemon.src == agent.path[i] and pokemon.dest == agent.path[i + 1]:
+                            return 0
+                    dist = self.graph_algo.shortest_path_dist(agent.src, pokemon.src)
+                    edge_dist = self.graph_algo.graph.out_edges.get(str(pokemon.src)).get(str(pokemon.dest)).weight
+                    priority = (dist + edge_dist) / pokemon.value
+                    if priority < best_priority:
+                        best_priority = priority
+                        pokemon_id = pokemon.id
+            return pokemon_id
 
     # Reduce the number of moves!
-    def sleep(self):
-        pass
+    def sleep(self, client: Client):
+        best = float('inf')
+        for pokemon in self.pokemons.values():
+            if pokemon.time < best:
+                best = pokemon.time
+        if best != float('inf'):
+            time_sec = best - client.time_to_end() - epsilon
+            time.sleep(time_sec)

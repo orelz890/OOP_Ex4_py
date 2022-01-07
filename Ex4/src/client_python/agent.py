@@ -1,3 +1,5 @@
+import math
+
 
 class Agent:
     def __init__(self, id: int = 0, value: float = 0.0, src: int = 0, dest: int = 0, speed: float = 1.0,
