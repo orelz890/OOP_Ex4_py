@@ -52,6 +52,5 @@ class Node:
         string = "{},{},{}".format(self.location[0], self.location[1], self.location[2])
         return string
 
-    def distance(self, node) -> float:
-        return math.sqrt(
-            math.pow(self.location[0] - node.location[0], 2) + math.pow(self.location[1] - node.location[1], 2))
+    def distance(self, loc: (float, float, float)) -> float:
+        return math.sqrt(math.pow(self.location[0] - loc[0], 2) + math.pow(self.location[1] - loc[1], 2))

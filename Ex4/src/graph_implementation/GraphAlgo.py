@@ -58,7 +58,8 @@ class GraphAlgo(GraphAlgoInterface):
             self.graph.add_node(node_dict.get("id"), tuple(node_dict.get("pos").split(",")))
         for edge_dict in graph_dict.get("Edges"):
             self.graph.add_edge(edge_dict.get("src"), edge_dict.get("dest"), edge_dict.get("w"))
-
+        if not self.is_connected():
+            raise Exception("The graph is not connected! try again\n")
 
     def save_to_json(self, file_name: str) -> bool:
         data = {"Nodes": [], "Edges": []}

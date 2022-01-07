@@ -19,9 +19,6 @@ class Agent:
         self.speed = agent.get("speed")
         self.pos = tuple(agent.get("pos").split(","))
 
-    def distance(self, loc: (float, float, float)) -> float:
-        return math.sqrt(math.pow(self.pos[0] - loc[0], 2) + math.pow(self.pos[1] - loc[1], 2))
-
 
 # if __name__ == '__main__':
 #     agent = Agent()
