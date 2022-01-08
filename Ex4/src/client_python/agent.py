@@ -19,7 +19,11 @@ class Agent:
         self.src = agent.get("src")
         self.dest = agent.get("dest")
         self.speed = agent.get("speed")
-        self.pos = tuple(agent.get("pos").split(","))
+        values: list = agent.get("pos").split(",")
+        temp = []
+        for item in values:
+            temp.append(float(item))
+        self.pos = tuple(temp)
 
 
 # if __name__ == '__main__':
