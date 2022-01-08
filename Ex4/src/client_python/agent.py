@@ -12,7 +12,6 @@ class Agent:
         self.pos = pos
         self.missions: [int] = []
         self.path: [int] = []
-        self.free_time = 0
 
     def load_agent(self, agent: dict):
         self.id = agent.get("id")
