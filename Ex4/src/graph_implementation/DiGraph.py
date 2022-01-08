@@ -1,6 +1,6 @@
 from Ex4.src.graph_implementation.Node import Node
 from Ex4.src.graph_implementation.Edge import Edge
-from Ex4.src.api.GraphInterface import GraphInterface
+from Ex4.src.graph_implementation.api.GraphInterface import GraphInterface
 from Ex4.src.graph_implementation.PQ import PriorityQueue
 
 no_path = -1

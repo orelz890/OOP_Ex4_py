@@ -1,14 +1,12 @@
 import json
 import random
-import queue
-import time
 from typing import List
 
 from matplotlib import pyplot as plt
 
-from Ex4.src.api.GraphAlgoInterface import GraphAlgoInterface
+from Ex4.src.graph_implementation.api.GraphAlgoInterface import GraphAlgoInterface
 from Ex4.src.graph_implementation.DiGraph import DiGraph
-from Ex4.src.api.GraphInterface import GraphInterface
+from Ex4.src.graph_implementation.api.GraphInterface import GraphInterface
 
 valid_path = 1
 zero_dist = 0

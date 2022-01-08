@@ -159,3 +159,6 @@ class Game:
         if closest_time != float('inf'):
             time_sec = client.time_to_end() - closest_time - epsilon
             time.sleep(time_sec)
+
+if __name__ == '__main__':
+    print(0)
