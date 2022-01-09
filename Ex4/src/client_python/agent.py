@@ -12,6 +12,7 @@ class Agent:
         self.pos = pos
         self.missions: [int] = []
         self.path: [int] = []
+        self.final_src = -1
 
     def load_agent(self, agent: dict):
         self.id = agent.get("id")

@@ -17,41 +17,44 @@ class Game:
         self.graph_algo.load_from_str(graph_str)
         self.sleep_time = []
 
-    def load_game_data(self, pokemons_str: str, agents_str: str):
+    def load_game_data(self, pokemons_str: str, agents_str: str, graph_str):
 
-        if agents_str is None or pokemons_str is None:
-            return None
-        agents_dict: dict = json.loads(agents_str)
-        for agent_d in agents_dict.get("Agents"):
-            data: dict = agent_d.get("Agent")
-            self.agents[str(data.get("id"))] = Agent().load_agent(data)
+        if agents_str is not None:
+            agents_dict: dict = json.loads(agents_str)
+            for agent_d in agents_dict.get("Agents"):
+                data: dict = agent_d.get("Agent")
+                self.agents[str(data.get("id"))] = Agent().load_agent(data)
 
-        pokemons_dict: dict = json.loads(pokemons_str)
-        # Add the pokemons:
-        graph: DiGraph = self.graph_algo.graph
-        pokemon_id = 0
-        for pokemon_d in pokemons_dict.get("Pokemons"):
-            data: dict = pokemon_d.get("Pokemon")
-            pokemon: Pokemon = Pokemon().load_pokemon(data)
-            # Finds on which edge the pokemon stands:
-            for edge in graph.out_edges:
-                src = graph.nodes_dict.get(str(edge.src))
-                dst = graph.nodes_dict.get(str(edge.dest))
-                edge_dist = src.distance(dst)
-                pokemon_dist = src.distance(pokemon.pos) + dst.distance(pokemon.pos)
-                # If True it means the pokemon is on the current edge or the opposite edge:
-                # note: The pokemon type cant be zero (assumption).
-                if abs(edge_dist - pokemon_dist) < epsilon:
-                    maxi = max(edge.src, edge.dest)
-                    mini = min(edge.src, edge.dest)
-                    if pokemon.type < 0:
-                        pokemon.src = mini
-                        pokemon.dest = maxi
-                    if pokemon.type > 0:
-                        pokemon.src = maxi
-                        pokemon.dest = mini
-            self.agents[str(pokemon_id)] = pokemon
-            pokemon_id += 1
+        if pokemons_str is not None:
+            pokemons_dict: dict = json.loads(pokemons_str)
+            # Add the pokemons:
+            graph: DiGraph = self.graph_algo.graph
+            pokemon_id = 0
+            for pokemon_d in pokemons_dict.get("Pokemons"):
+                data: dict = pokemon_d.get("Pokemon")
+                pokemon: Pokemon = Pokemon().load_pokemon(data)
+                # Finds on which edge the pokemon stands:
+                for edge in graph.out_edges:
+                    src = graph.nodes_dict.get(str(edge.src))
+                    dst = graph.nodes_dict.get(str(edge.dest))
+                    edge_dist = src.distance(dst)
+                    pokemon_dist = src.distance(pokemon.pos) + dst.distance(pokemon.pos)
+                    # If True it means the pokemon is on the current edge or the opposite edge:
+                    # note: The pokemon type cant be zero (assumption).
+                    if abs(edge_dist - pokemon_dist) < epsilon:
+                        maxi = max(edge.src, edge.dest)
+                        mini = min(edge.src, edge.dest)
+                        if pokemon.type < 0:
+                            pokemon.src = mini
+                            pokemon.dest = maxi
+                        if pokemon.type > 0:
+                            pokemon.src = maxi
+                            pokemon.dest = mini
+                self.agents[str(pokemon_id)] = pokemon
+                pokemon_id += 1
+        # For the gui
+        if graph_str is not None:
+            self.graph_algo.load_from_str(graph_str)
 
     # update all the agent mission list, need to think how frequently
     def update_all_tasks(self, client: Client):
@@ -61,13 +64,16 @@ class Game:
     # Updates the agent next step
     def update_agent_task(self, client: Client, agent_id: int):
         agent: Agent = self.agents.get(str(agent_id))
-        if agent is not None and agent.dest == -1:
+        if agent is not None and agent.dest != -1:
             if agent.path:
                 client.choose_next_edge(
                     '{"agent_id":' + str(agent_id) + ', "next_node_id":' + str(agent.path[0]) + '}')
                 agent.path.pop(0)
                 # node_id = agent.path.pop(0)
                 # agent.pos = self.graph_algo.graph.nodes_dict.get(str(node_id)).pos
+
+            else:
+                agent.dest = -1
 
     # Figure out who will take our beloved pokemons
     def allocate_agent_to_pokemon(self, client: Client) -> None:
@@ -82,6 +88,7 @@ class Game:
         # If not already on his way
         if job_time != 0:
             agent.path.append(shortest_path[1])
+            agent.path.append(pokemon.dest)
 
     """
         Finds the fastest agent available & allocate the pokemon with the highest priority to him 
@@ -142,8 +149,8 @@ class Game:
                 if pokemon.src == agent.path[i] and pokemon.dest == agent.path[i + 1]:
                     shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
                     pokemon.time = client.time_to_end() - shortest_path[0]
-                    agent.missions.append(pokemon.src)
                     agent.path.append(shortest_path[1])
+                    agent.path.append(pokemon.dest)
                     break
                 i += 1
         self.pokemons[str(pokemon.id)] = pokemon
@@ -157,8 +164,9 @@ class Game:
                 closest_time = pokemon.time
         # If we got a valid value, sleep till we get there.
         if closest_time != float('inf'):
-            time_sec = client.time_to_end() - closest_time - epsilon
+            time_sec = client.time_to_end() - closest_time - 0.02
             time.sleep(time_sec)
+
 
 if __name__ == '__main__':
     print(0)
