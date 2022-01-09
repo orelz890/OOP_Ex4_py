@@ -1,16 +1,15 @@
 
 class Agent:
-    def __init__(self):
-        self.id = -1
+    def __init__(self, id: int = -1):
+        self.id = id
         self.value = 0.0
         self.src = -1
         self.dest = -1
         self.speed = 1.0
         self.pos = pos = (35.18753053591606, 32.10378225882353, 0.0)
-        self.path: [int] = []
+        self.path = []
 
     def load_agent(self, agent: dict):
-        self.id = agent.get('id')
         self.value = agent.get("value")
         self.src = agent.get("src")
         self.dest = agent.get("dest")

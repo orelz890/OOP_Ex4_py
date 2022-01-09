@@ -7,7 +7,7 @@ class Pokemon:
         self.src = -1
         self.dest = -1
         self.agent_id = -1
-        self.time = float('inf')
+        self.time = -1
 
     # def __repr__(self) -> str:
     #     return str((self.src, self.dest))

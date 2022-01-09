@@ -26,7 +26,7 @@ class Game:
             agents_dict = json.loads(agents_str)
             for agent_d in agents_dict.get('Agents'):
                 data: dict = agent_d.get('Agent')
-                agent = Agent()
+                agent = self.agents.get(str(data.get('id')))
                 agent.load_agent(data)
                 self.agents[str(agent.id)] = agent
 
@@ -69,26 +69,30 @@ class Game:
         agent: Agent = self.agents.get(str(agent_id))
         if agent is not None and agent.dest != -1:
             if agent.path:
+                # print(agent.path)
+                poped = agent.path.pop(0)
+                # print(agent.path)
+                # print(poped)
                 client.choose_next_edge(
-                    '{"agent_id":' + str(agent_id) + ', "next_node_id":' + str(agent.path[0]) + '}')
-                agent.path.pop(0)
+                    '{"agent_id":' + str(agent_id) + ', "next_node_id":' + str(poped) + '}')
                 # node_id = agent.path.pop(0)
                 # agent.pos = self.graph_algo.graph.nodes_dict.get(str(node_id)).pos
-
             else:
                 agent.dest = -1
 
     # Figure out who will take our beloved pokemons
-    def allocate_agent_to_pokemon(self, client: Client) -> None:
-        agent, pokemon, job_time = self.priority_cal(client)
+    def allocate_agent_to_pokemon(self, client: Client, agent_id) -> None:
+        agent, pokemon, job_time = self.priority_cal(agent_id)
         if agent is None or pokemon is None:
             return
         shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
-        pokemon.time = client.time_to_end() - job_time
+        pokemon.time = float(client.time_to_end()) / 1000 - job_time
         # If not already on his way
-        if job_time != 0:
-            agent.path.append(shortest_path[1])
+        if job_time > 0 and agent.dest == -1:
+            for node in shortest_path[1]:
+                agent.path.append(node)
             agent.path.append(pokemon.dest)
+            agent.dest = pokemon.dest
 
     """
         Finds the fastest agent available & allocate the pokemon with the highest priority to him 
@@ -97,17 +101,8 @@ class Game:
         Last, returns tuple(agent id, pokemon id , time in which he will be peaked)
     """
 
-    def priority_cal(self, client: Client) -> (int, int, int):
+    def priority_cal(self, agent_id) -> (int, int, int):
         if not self.pokemons:
-            return None, None, -1
-        # Finding the fastest agent available.
-        agent_id = -1
-        for agent in self.agents.values():
-            if agent.dest == -1:
-                if agent_id == -1 or agent.speed > self.agents.get(str(agent_id)).speed:
-                    agent_id = agent.id
-        # If True all agents are busy
-        if agent_id == -1:
             return None, None, -1
         # Finding the the best pokemon to catch for this agent.
         agent: Agent = self.agents.get(str(agent_id))
@@ -165,9 +160,6 @@ class Game:
                 closest_time = pokemon.time
         # If we got a valid value, sleep till we get there.
         if closest_time != float('inf'):
-            time_sec = client.time_to_end() - closest_time - 0.02
+            time_sec = float(client.time_to_end()) / 1000 - closest_time - 0.02
             time.sleep(time_sec)
 
-
-if __name__ == '__main__':
-    print(0)
