@@ -53,4 +53,19 @@ class Node:
         return string
 
     def distance(self, loc: (float, float, float)) -> float:
-        return math.sqrt(math.pow(self.location[0] - loc[0], 2) + math.pow(self.location[1] - loc[1], 2))
+        temp1 = []
+        for item in loc:
+            temp1.append(float(item))
+        position = tuple(temp1)
+        temp2 = []
+        for item in self.location:
+            temp2.append(float(item))
+        location = tuple(temp2)
+        ans = math.sqrt(math.pow(location[0] - position[0], 2) + math.pow(location[1] - position[1], 2))
+        return ans
+
+
+# if __name__ == '__main__':
+#     node1 = Node(0, (1, 2, 3))
+#     pos2 = (2, 2, 3)
+#     print(node1.distance(pos2))

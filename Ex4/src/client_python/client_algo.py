@@ -1,6 +1,6 @@
 import json
 from Ex4.src.graph_implementation.GraphAlgo import GraphAlgo
-from Ex4.src.graph_implementation.DiGraph import DiGraph
+from Ex4.src.graph_implementation.Node import Node
 from Ex4.src.client_python.agent import Agent
 from Ex4.src.client_python.pokemon import Pokemon
 from Ex4.src.client_python.client import Client
@@ -18,45 +18,46 @@ class Game:
 
     def load_game_data(self, agents_str=None, pokemons_str=None, graph_str=None):
 
+        # For the gui
+        if graph_str is not None:
+            self.graph_algo.load_from_str(graph_str)
+
         if agents_str is not None:
             agents_dict = json.loads(agents_str)
             for agent_d in agents_dict.get('Agents'):
                 data: dict = agent_d.get('Agent')
-                agent = self.agents.get(str(data.get('id')))
+                agent = Agent()
                 agent.load_agent(data)
+                self.agents[str(agent.id)] = agent
 
         if pokemons_str is not None:
             pokemons_dict: dict = json.loads(pokemons_str)
             # Add the pokemons:
-            graph: DiGraph = self.graph_algo.graph
             pokemon_id = 0
             for pokemon_d in pokemons_dict.get("Pokemons"):
                 data: dict = pokemon_d.get("Pokemon")
                 pokemon: Pokemon = Pokemon()
-                pokemon = pokemon.load_pokemon(data)
+                pokemon.load_pokemon(data)
                 # Finds on which edge the pokemon stands:
-                for edge in graph.out_edges:
-                    src = graph.nodes_dict.get(str(edge.src))
-                    dst = graph.nodes_dict.get(str(edge.dest))
-                    edge_dist = src.distance(dst)
-                    pokemon_dist = src.distance(pokemon.pos) + dst.distance(pokemon.pos)
-                    # If True it means the pokemon is on the current edge or the opposite edge:
-                    # note: The pokemon type cant be zero (assumption).
-                    if abs(edge_dist - pokemon_dist) < epsilon:
-                        maxi = max(edge.src, edge.dest)
-                        mini = min(edge.src, edge.dest)
-                        if pokemon.type < 0:
-                            pokemon.src = mini
-                            pokemon.dest = maxi
-                        if pokemon.type > 0:
-                            pokemon.src = maxi
-                            pokemon.dest = mini
-                self.agents[str(pokemon_id)] = pokemon
+                for val in self.graph_algo.graph.out_edges.values():
+                    for edge in val.values():
+                        src: Node = self.graph_algo.graph.nodes_dict.get(str(edge.src))
+                        dst: Node = self.graph_algo.graph.nodes_dict.get(str(edge.dest))
+                        edge_dist = src.distance(dst.location)
+                        pokemon_dist = src.distance(pokemon.pos) + dst.distance(pokemon.pos)
+                        # If True it means the pokemon is on the current edge or the opposite edge:
+                        # note: The pokemon type cant be zero (assumption).
+                        if abs(edge_dist - pokemon_dist) < epsilon:
+                            maxi = max(edge.src, edge.dest)
+                            mini = min(edge.src, edge.dest)
+                            if pokemon.type < 0:
+                                pokemon.src = mini
+                                pokemon.dest = maxi
+                            if pokemon.type > 0:
+                                pokemon.src = maxi
+                                pokemon.dest = mini
+                self.pokemons[str(pokemon_id)] = pokemon
                 pokemon_id += 1
-        # For the gui
-        if graph_str is not None:
-            self.graph_algo.load_from_str(graph_str)
-        print(10)
 
     # update all the agent mission list, need to think how frequently
     def update_all_tasks(self, client: Client):
@@ -79,13 +80,10 @@ class Game:
 
     # Figure out who will take our beloved pokemons
     def allocate_agent_to_pokemon(self, client: Client) -> None:
-        agent_id, pokemon_id, job_time = self.priority_cal(client)
-        if agent_id == -1 or pokemon_id == -1:
+        agent, pokemon, job_time = self.priority_cal(client)
+        if agent is None or pokemon is None:
             return
-        agent: Agent = self.agents.get(str(agent_id))
-        pokemon: Pokemon = self.pokemons.get(str(pokemon_id))
         shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
-        pokemon.agent_id = agent_id
         pokemon.time = client.time_to_end() - job_time
         # If not already on his way
         if job_time != 0:
@@ -101,7 +99,7 @@ class Game:
 
     def priority_cal(self, client: Client) -> (int, int, int):
         if not self.pokemons:
-            return -1, -1, -1
+            return None, None, -1
         # Finding the fastest agent available.
         agent_id = -1
         for agent in self.agents.values():
@@ -110,23 +108,24 @@ class Game:
                     agent_id = agent.id
         # If True all agents are busy
         if agent_id == -1:
-            return -1, -1, -1
+            return None, None, -1
         # Finding the the best pokemon to catch for this agent.
         agent: Agent = self.agents.get(str(agent_id))
         best_priority = float('inf')
-        pokemon_id = -1
+        pokemon_ans = None
         distance = float('inf')
         for pokemon in self.pokemons.values():
-            if pokemon.time > client.time_to_end():
-                self.pokemons.pop(pokemon.id)
-                continue
+            # if pokemon.time > client.time_to_end():
+            #     self.pokemons.pop(pokemon.id)
+            #     continue
+
             # Check if the pokemon already been assigned.
             if pokemon.agent_id == -1:
                 i = 0
                 # Checking if the pokemon on the way.
                 while i < len(agent.path) - 2:
                     if pokemon.src == agent.path[i] and pokemon.dest == agent.path[i + 1]:
-                        return agent_id, pokemon_id, 0
+                        return agent, pokemon, 0
                     i += 1
                 # Not on the way
                 dist = self.graph_algo.shortest_path_dist(agent.src, pokemon.src)
@@ -134,28 +133,28 @@ class Game:
                 priority = dist / pokemon.value
                 if priority < best_priority:
                     best_priority = priority
-                    pokemon_id = pokemon.id
+                    pokemon_ans = pokemon
                     distance = dist
         job_time = distance / agent.speed
         # If, we got a valid answer return it. Else, return error flag.
-        if pokemon_id == -1 and distance != float('inf'):
-            return agent_id, pokemon_id, job_time
-        return -1, -1, -1
+        if pokemon_ans is not None and distance != float('inf'):
+            return agent, pokemon_ans, job_time
+        return None, None, -1
 
-    def add_pokemon(self, pokemon: Pokemon, client: Client) -> None:
-        # Checking if the pokemon on some agent way.
-        for agent in self.agents.values():
-            i = 0
-            while i < len(agent.path) - 2:
-                # If do:
-                if pokemon.src == agent.path[i] and pokemon.dest == agent.path[i + 1]:
-                    shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
-                    pokemon.time = client.time_to_end() - shortest_path[0]
-                    agent.path.append(shortest_path[1])
-                    agent.path.append(pokemon.dest)
-                    break
-                i += 1
-        self.pokemons[str(pokemon.id)] = pokemon
+    # def add_pokemon(self, pokemon: Pokemon, client: Client) -> None:
+    #     # Checking if the pokemon on some agent way.
+    #     for agent in self.agents.values():
+    #         i = 0
+    #         while i < len(agent.path) - 2:
+    #             # If do:
+    #             if pokemon.src == agent.path[i] and pokemon.dest == agent.path[i + 1]:
+    #                 shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
+    #                 pokemon.time = client.time_to_end() - shortest_path[0]
+    #                 agent.path.append(shortest_path[1])
+    #                 agent.path.append(pokemon.dest)
+    #                 break
+    #             i += 1
+    #     self.pokemons[str(pokemon.id)] = pokemon
 
     # Reduce the number of moves!
     def sleep(self, client: Client):

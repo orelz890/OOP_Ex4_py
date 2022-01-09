@@ -1,15 +1,12 @@
-import math
-
 
 class Agent:
-    def __init__(self, id: int = 0, value: float = 0.0, src: int = 0, dest: int = 0, speed: float = 1.0,
-                 pos: tuple = (35.18753053591606, 32.10378225882353, 0.0)):
-        self.id = id
-        self.value = value
-        self.src = src
-        self.dest = dest
-        self.speed = speed
-        self.pos = pos
+    def __init__(self):
+        self.id = -1
+        self.value = 0.0
+        self.src = -1
+        self.dest = -1
+        self.speed = 1.0
+        self.pos = pos = (35.18753053591606, 32.10378225882353, 0.0)
         self.path: [int] = []
 
     def load_agent(self, agent: dict):
