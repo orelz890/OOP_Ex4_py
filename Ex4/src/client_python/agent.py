@@ -10,12 +10,10 @@ class Agent:
         self.dest = dest
         self.speed = speed
         self.pos = pos
-        self.missions: [int] = []
         self.path: [int] = []
-        self.final_src = -1
 
     def load_agent(self, agent: dict):
-        self.id = agent.get("id")
+        self.id = agent.get('id')
         self.value = agent.get("value")
         self.src = agent.get("src")
         self.dest = agent.get("dest")

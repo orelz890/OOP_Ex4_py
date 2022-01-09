@@ -128,7 +128,6 @@ class Client:
                 }
             ]
         }
-
         """
         res = self.__send_message("getPokemons")
         return res

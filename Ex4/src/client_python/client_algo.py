@@ -10,20 +10,20 @@ epsilon = 0.0000001
 
 
 class Game:
-    def __init__(self, graph_str: str):
+    def __init__(self):
         self.agents = {}
         self.pokemons = {}
         self.graph_algo: GraphAlgo = GraphAlgo()
-        self.graph_algo.load_from_str(graph_str)
         self.sleep_time = []
 
-    def load_game_data(self, pokemons_str: str, agents_str: str, graph_str):
+    def load_game_data(self, agents_str=None, pokemons_str=None, graph_str=None):
 
         if agents_str is not None:
-            agents_dict: dict = json.loads(agents_str)
-            for agent_d in agents_dict.get("Agents"):
-                data: dict = agent_d.get("Agent")
-                self.agents[str(data.get("id"))] = Agent().load_agent(data)
+            agents_dict = json.loads(agents_str)
+            for agent_d in agents_dict.get('Agents'):
+                data: dict = agent_d.get('Agent')
+                agent = self.agents.get(str(data.get('id')))
+                agent.load_agent(data)
 
         if pokemons_str is not None:
             pokemons_dict: dict = json.loads(pokemons_str)
@@ -32,7 +32,8 @@ class Game:
             pokemon_id = 0
             for pokemon_d in pokemons_dict.get("Pokemons"):
                 data: dict = pokemon_d.get("Pokemon")
-                pokemon: Pokemon = Pokemon().load_pokemon(data)
+                pokemon: Pokemon = Pokemon()
+                pokemon = pokemon.load_pokemon(data)
                 # Finds on which edge the pokemon stands:
                 for edge in graph.out_edges:
                     src = graph.nodes_dict.get(str(edge.src))
@@ -55,6 +56,7 @@ class Game:
         # For the gui
         if graph_str is not None:
             self.graph_algo.load_from_str(graph_str)
+        print(10)
 
     # update all the agent mission list, need to think how frequently
     def update_all_tasks(self, client: Client):
