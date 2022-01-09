@@ -1,13 +1,15 @@
-
 class Agent:
-    def __init__(self, id: int = -1):
+
+    def __init__(self, id: int, value: float, src: int, dest: int, speed: float, pos: str):
         self.id = id
-        self.value = 0.0
-        self.src = -1
-        self.dest = -1
-        self.speed = 1.0
-        self.pos = pos = (35.18753053591606, 32.10378225882353, 0.0)
+        self.value = value
+        self.src = src
+        self.dest = dest
+        self.speed = speed
+        self.pos = pos
+
         self.path = []
+        self.free_time = -1
 
     def load_agent(self, agent: dict):
         self.value = agent.get("value")
@@ -20,6 +22,9 @@ class Agent:
             temp.append(float(item))
         self.pos = tuple(temp)
 
+    # def creat_pos(self, pos):
+    #     temp_pos = pos.split(',')
+    #     self.pos = (float(temp_pos[0]), float(temp_pos[1]), float(temp_pos[2]))
 
 # if __name__ == '__main__':
 #     agent = Agent()

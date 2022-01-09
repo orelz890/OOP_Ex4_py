@@ -15,7 +15,7 @@ class TestAgent(TestCase):
     def test_load_agent(self):
         agent: Agent = Agent()
         agent.load_agent(self.json_dict)
-        self.assertEqual(0, agent.id)
+        self.assertEqual(-1, agent.id)
         self.assertEqual(0.0, agent.value)
         self.assertEqual(0, agent.src)
         self.assertEqual(1, agent.dest)
