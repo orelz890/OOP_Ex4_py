@@ -99,4 +99,4 @@ class Game:
             # Dont allocate the same pokemon twice
             if pokemon_ans.agent_id == -1:
                 pokemon_ans.agent_id = agent.id
-            self.update_agent_task(agent, next_move)
+        self.update_agent_task(agent, next_move)

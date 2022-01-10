@@ -25,6 +25,8 @@ if __name__ == '__main__':
     pokemon_d = pokemon_info.get("Pokemons")
     for i in range(size):
         ag_str = "{}\"id\":{}{}".format('{', game.pokemons.get(str(i)).src, '}')
+        # if i == 0:
+        #     ag_str = "{}\"id\":{}{}".format('{', game.graph_algo.centerPoint()[0], '}')
         client.add_agent(ag_str)
         game.agents[str(i)] = Agent(id=i, value=0.0, src=-1, dest=-1, speed=1.0, pos="0.0,0.0,0.0")
         i += 1
