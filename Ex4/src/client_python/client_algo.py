@@ -49,12 +49,6 @@ class Game:
                         if abs(edge_dist - pokemon_dist) < epsilon:
                             maxi = max(edge.src, edge.dest)
                             mini = min(edge.src, edge.dest)
-                            # if pokemon.type < 0:
-                            #     pokemon.src = mini
-                            #     pokemon.dest = maxi
-                            # if pokemon.type > 0:
-                            #     pokemon.src = maxi
-                            #     pokemon.dest = mini
                             if pokemon.type < 0:
                                 pokemon.src = maxi
                                 pokemon.dest = mini
@@ -102,6 +96,7 @@ class Game:
                     else:
                         next_move = pokemon.dest
         if pokemon_ans != None:
+            # Dont allocate the same pokemon twice
             if pokemon_ans.agent_id == -1:
                 pokemon_ans.agent_id = agent.id
             self.update_agent_task(agent, next_move)
