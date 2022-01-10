@@ -29,7 +29,7 @@ class TestAgent(TestCase):
     }
 
     def test_load_agent(self):
-        agent: Agent = Agent(0,0,0,0,0,"4")
+        agent: Agent = Agent(0, 0, 0, 0, 0, "4")
         agent.load_agent(self.json_dict)
         self.assertEqual(0, agent.id)
         self.assertEqual(0.0, agent.value)
@@ -38,7 +38,7 @@ class TestAgent(TestCase):
         self.assertEqual(1.0, agent.speed)
         self.assertEqual((35.18753053591606, 32.10378225882353, 0.0), agent.pos)
 
-        agent1: Agent = Agent(1, 3, 3, 1,10, "4")
+        agent1: Agent = Agent(1, 3, 3, 1, 10, "4")
         agent1.load_agent(self.json_dict1)
         self.assertEqual(1, agent1.id)
         self.assertEqual(0.0, agent1.value)
@@ -55,6 +55,3 @@ class TestAgent(TestCase):
         self.assertEqual(5, agent2.dest)
         self.assertEqual(5.0, agent2.speed)
         self.assertEqual((35.18753053591616, 32.10378225882210, 0.0), agent2.pos)
-
-
-
