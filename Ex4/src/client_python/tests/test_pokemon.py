@@ -10,6 +10,7 @@ class TestPokemon(TestCase):
         "pos": "35.197656770719604,32.10191878639921,0.0"
     }
 
+
     def test_load_pokemon(self):
         pokemon: Pokemon = Pokemon()
         pokemon.load_pokemon(self.json_dict)
