@@ -39,9 +39,12 @@ if __name__ == '__main__':
         game.allocate_all()
         gui.draw()
         # print(client.get_info())
-        time.sleep(0.08)
+        time.sleep(0.078)
         client.move()
-        time.sleep(0.02)
+        time.sleep(0.012)
+
+
+
 
     client.stop_connection()
     # print(client.get_info())

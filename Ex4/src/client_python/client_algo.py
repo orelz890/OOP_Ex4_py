@@ -78,6 +78,7 @@ class Game:
             if agent.dest == -1:
                 self.priority_allocation(agent)
 
+
     """
         Given an agent, allocate the pokemon with the highest priority to him 
         (dist/value == priority).
@@ -101,8 +102,6 @@ class Game:
                     else:
                         next_move = pokemon.dest
         if pokemon_ans != None:
-            # if agent.src == pokemon_ans.src:
-            #     self.client.move()
             if pokemon_ans.agent_id == -1:
                 pokemon_ans.agent_id = agent.id
             self.update_agent_task(agent, next_move)
