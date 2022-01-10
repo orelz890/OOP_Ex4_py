@@ -1,0 +1,136 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+@startuml
+
+Class01 <|-- Class02
+Class03 *-- Class04
+Class05 o-- Class06
+Class07 .. Class08
+Class09 -- Class10
+
+@startuml
+GraphAlgo -- DiGraph
+client_main <-- client
+client_main <-- Game
+Game <-- client
+Game -- GraphAlgo
+Game -- Pokemon
+Game -- Agent
+DiGraph -- Node
+DiGraph -- Edge
+DiGraph -- PQ
+
+class DiGraph {
+  .. self ..
+    nodes_dict : dict
+    into_edges : dict
+    out_edges : dict
+    node_size : int
+    edge_size : int
+    MC = int
+  .. functions ..
+  + v_size
+  + e_size
+  + get_all_v
+  + all_in_edges_of_node
+  + all_out_edges_of_node
+  + add_edge
+  + add_node
+  + remove_node
+  + remove_edge
+  + dijkstra
+  + set_all_tags
+  .. geeters ..
+  + get_mc
+}
+
+
+class GraphAlgo {
+  .. self ..
+   g : DiGraph
+  .. functions ..
+  + get_graph
+  + load_from_json
+  + save_to_json
+  + is_connected
+  + shortest_path_dist
+  + shortest_path
+  + TSP
+  + centerPoint
+  + plot_graph
+}
+
+class Pokemon {
+ .. self ..
+    id: int
+    value: float
+    type: int
+    pos: tuple
+    src: int
+    dest: int
+    agent_id: int
+    time: float
+ ..Fuctions..
+ +load_pokemon(pokemon:dict)
+}
+class Agent {
+ .. self ..
+    id: int
+    value: float
+    src: int
+    dest: int
+    speed = float
+    pos: tuple
+    path: list
+    free_time: float
+ ..Fuctions..
+ +load_agent(agent:dist)
+}
+class Game {
+ .. self ..
+    client = client
+    agents = {}
+    pokemons = {}
+    graph_algo: GraphAlgo = GraphAlgo()
+ ..Fuctions..
+ +load_game_data(agents, pokemons, graph)
+ +update_agent_task(agent, dest)
+ +allocate_all()
+ +priority_allocation(agent)
+}
+class client_main {
+ .. tester ..
+}
+class client {
+ .. Server ..
+}
+class Edge {
+ .. self ..
+   src : int
+   dest : int
+   weight : int
+}
+class Node {
+ .. self ..
+   key : int
+   tag : int
+   weight : float
+   w : float
+}
+class PQ {
+ .. self ..
+   queue : list
+   .. functions ..
+  + isEmpty
+  + insert
+  + size
+  + delete
+}
+
+@enduml
+
+
+

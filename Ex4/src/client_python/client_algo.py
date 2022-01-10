@@ -14,7 +14,6 @@ class Game:
         self.agents = {}
         self.pokemons = {}
         self.graph_algo: GraphAlgo = GraphAlgo()
-        self.sleep_time = []
 
     def load_game_data(self, agents_str=None, pokemons_str=None, graph_str=None):
         # For the gui

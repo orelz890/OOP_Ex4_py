@@ -1,0 +1,118 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+@startuml
+
+Class01 <|-- Class02
+Class03 *-- Class04
+Class05 o-- Class06
+Class07 .. Class08
+Class09 -- Class10
+
+@startuml
+GraphAlgo -- DiGraph
+DiGraph -- Node
+DiGraph -- Edge
+GraphAlgo -- input
+main -- input
+DiGraph -- PQ
+main -- GraphAlgo
+GraphInterface --|> DiGraph
+GraphAlgoInterface --|> GraphAlgo
+
+class DiGraph {
+  .. self ..
+    nodes_dict : dict
+    into_edges : dict
+    out_edges : dict
+    node_size : int
+    edge_size : int
+    MC = int
+  .. functions ..
+  + v_size
+  + e_size
+  + get_all_v
+  + all_in_edges_of_node
+  + all_out_edges_of_node
+  + add_edge
+  + add_node
+  + remove_node
+  + remove_edge
+  + dijkstra
+  + set_all_tags
+  .. geeters ..
+  + get_mc
+}
+
+class GraphInterface{
+  .. To implement ..
+  + v_size
+  + e_size
+  + get_all_v
+  + all_in_edges_of_node
+  + all_out_edges_of_node
+  + add_edge
+  + add_node
+  + remove_node
+  + remove_edge
+}
+class GraphAlgoInterface{
+  .. To implement ..
+  + get_graph
+  + load_from_json
+  + save_to_json
+  + shortest_path
+  + TSP
+  + centerPoint
+  + plot_graph
+}
+
+class GraphAlgo {
+  .. self ..
+   g : DiGraph
+  .. functions ..
+  + get_graph
+  + load_from_json
+  + save_to_json
+  + is_connected
+  + shortest_path_dist
+  + shortest_path
+  + TSP
+  + centerPoint
+  + plot_graph
+}
+class Edge {
+ .. self ..
+   src : int
+   dest : int
+   weight : int
+}
+class Node {
+ .. self ..
+   key : int
+   tag : int
+   weight : float
+   w : float
+}
+class PQ {
+ .. self ..
+   queue : list
+   .. functions ..
+  + isEmpty
+  + insert
+  + size
+  + delete
+}
+class main {
+ .. tester ..
+}
+class input {
+ .. json ..
+}
+
+@enduml
+
+
+

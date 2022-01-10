@@ -8,10 +8,10 @@ from pygame import gfxdraw
 import time
 from Ex4.src.client_python.client import Client
 
-YELLOWPOKENON = pygame.image.load('pikachu.png')
-AGENT = pygame.image.load('agent.png')
-BACKGROUNDIMG = pygame.image.load('arena.png')
-ORANGEPOKEMON = pygame.image.load('charmander.png')
+YELLOWPOKENON = pygame.image.load('images/pikachu.png')
+AGENT = pygame.image.load('images/agent.png')
+BACKGROUNDIMG = pygame.image.load('images/arena.png')
+ORANGEPOKEMON = pygame.image.load('images/charmander.png')
 WIDTH, HEIGHT = 1600, 800
 radius = 15
 
