@@ -7,8 +7,7 @@ class Agent:
         self.dest = dest
         self.speed = speed
         self.pos = pos
-
-        self.path = []
+        self.path: list = []
         self.free_time = -1
 
     def load_agent(self, agent: dict):

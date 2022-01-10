@@ -8,7 +8,6 @@ import time
 
 epsilon = 0.0000001
 
-
 class Game:
     def __init__(self, client: Client):
         self.client = client
