@@ -8,6 +8,7 @@ import time
 
 epsilon = 0.0000001
 
+
 class Game:
     def __init__(self, client: Client):
         self.client = client
@@ -48,12 +49,18 @@ class Game:
                         if abs(edge_dist - pokemon_dist) < epsilon:
                             maxi = max(edge.src, edge.dest)
                             mini = min(edge.src, edge.dest)
+                            # if pokemon.type < 0:
+                            #     pokemon.src = mini
+                            #     pokemon.dest = maxi
+                            # if pokemon.type > 0:
+                            #     pokemon.src = maxi
+                            #     pokemon.dest = mini
                             if pokemon.type < 0:
-                                pokemon.src = mini
-                                pokemon.dest = maxi
-                            if pokemon.type > 0:
                                 pokemon.src = maxi
                                 pokemon.dest = mini
+                            if pokemon.type > 0:
+                                pokemon.src = mini
+                                pokemon.dest = maxi
                             if pokemon.type == 0:
                                 pokemon.src = mini
                                 pokemon.dest = mini
@@ -72,8 +79,8 @@ class Game:
                 self.priority_allocation(agent)
 
     """
-        Finds the fastest agent available & allocate the pokemon with the highest priority to him 
-        (time/value == priority).
+        Given an agent, allocate the pokemon with the highest priority to him 
+        (dist/value == priority).
         When allocated, he will not change course for any one!
         Last, returns tuple(agent id, pokemon id , time in which he will be peaked)
     """
@@ -83,14 +90,19 @@ class Game:
         next_move: int = -1
         pokemon_ans = None
         for pokemon in self.pokemons.values():
-            shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
-            priority = shortest_path[0] / agent.speed
-            if priority < prioritized:
-                pokemon_ans = pokemon
-                prioritized = priority
-                if prioritized != 0:
-                    next_move = shortest_path[1][1]
-                else:
-                    next_move = pokemon.dest
+            if pokemon.agent_id == -1:
+                shortest_path = self.graph_algo.shortest_path(agent.src, pokemon.src)
+                priority = shortest_path[0] / agent.speed
+                if priority < prioritized:
+                    pokemon_ans = pokemon
+                    prioritized = priority
+                    if prioritized != 0:
+                        next_move = shortest_path[1][1]
+                    else:
+                        next_move = pokemon.dest
         if pokemon_ans != None:
+            # if agent.src == pokemon_ans.src:
+            #     self.client.move()
+            if pokemon_ans.agent_id == -1:
+                pokemon_ans.agent_id = agent.id
             self.update_agent_task(agent, next_move)
